@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>🎤 Subtítulos en tiempo real</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: white;
+      text-align: center;
+      padding: 30px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 18px;
+      border: none;
+      border-radius: 5px;
+      background: #0d6efd;
+      color: white;
+      cursor: pointer;
+    }
+    button:hover { background: #0b5ed7; }
+    #subtitles {
+      margin-top: 20px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 15px;
+      border-radius: 10px;
+      min-height: 50px;
+      font-size: 22px;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+  </style>
+</head>
+<body>
+  <h2>🎤 Detector de voz con subtítulos</h2>
+  <button id="startBtn">🎙️ Iniciar reconocimiento</button>
+  <div id="subtitles">Esperando voz...</div>
+
+  <script>
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      alert("❌ Tu navegador no soporta Web Speech API. Usa Chrome en Android o escritorio.");
+    } else {
+      const recognition = new SpeechRecognition();
+      recognition.lang = "es-ES";  
+      recognition.continuous = true;  // Sigue escuchando
+      recognition.interimResults = true; // Muestra resultados parciales
+
+      const subtitles = document.getElementById("subtitles");
+      const startBtn = document.getElementById("startBtn");
+
+      startBtn.addEventListener("click", () => {
+        recognition.start();
+        subtitles.textContent = "🎙️ Escuchando...";
+      });
+
+      recognition.onresult = (event) => {
+        let transcript = "";
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          transcript += event.results[i][0].transcript;
+        }
+        subtitles.textContent = transcript;
+      };
+
+      recognition.onerror = (e) => {
+        subtitles.textContent = "⚠️ Error: " + e.error;
+      };
+
+      recognition.onend = () => {
+        console.log("Reconocimiento finalizado, reiniciando...");
+        recognition.start(); // 🔥 Reinicia automáticamente para subtítulos continuos
+      };
+    }
+  </script>
+</body>
+</html>
